@@ -15,13 +15,23 @@ import { requestContactsPermission } from '../../helpers/ContactsPermission';
 import ListItem from '../../components/VerticalListItem';
 import styles from './styles';
 import HorizontalListItem from '../../components/HorizontalListItem';
+import { getSelectedLength } from '../../helpers/Contacts';
 
-interface contacts { }
+interface IContacts {
+  recordID: string,
+  givenName: string,
+  familyName: string,
+  isSelected: boolean,
+  hasThumbnail: boolean,
+  thumbnailPath: string,
+  push: () => void,
+  pop: () => void
+}
 
 const HomeScreen = () => {
-  const [contacts, setContacts] = useState([]);
-  const [selectedContacts, setSelectedContacts] = useState([]);
-
+  const [contacts, setContacts] = useState<IContacts>([]);
+  const [selectedLength, setSelectedLength] = useState(0);
+  const [render, setRender] = useState();
   useEffect(() => {
 
     (async () => {
@@ -34,14 +44,20 @@ const HomeScreen = () => {
     })();
 
   }, []);
+  useEffect(() => {
+    (async () => {
+      const length = await getSelectedLength(contacts);
+      console.log(length);
+      setSelectedLength(length)
+    })();
+
+  }, [render]);
 
   const loadContacts = () => {
-    console.log("loading contacts");
     Contacts.getAll().then(contacts => {
-      const myContacts = [];
+      const myContacts: IContacts = [];
       contacts.map((c) => {
-        // console.log(c);
-        const temp = {
+        const temp: IContacts = {
           recordID: c.recordID,
           givenName: c.givenName,
           familyName: c.familyName,
@@ -51,14 +67,14 @@ const HomeScreen = () => {
         };
         myContacts.push(temp);
       });
-      // console.log(myContacts);
       setContacts(myContacts);
     }).catch(e => {
       console.warn('Permission to access contacts was denied');
     });
   };
 
-  const selectContact = (contact: any) => {
+  const selectContact = (contact: IContact) => {
+
     let tempContacts = contacts;
     const contactToUpdate = tempContacts.find(c => c.recordID === contact.recordID);
     const indexToUpdate = tempContacts.findIndex(c => c.recordID === contact.recordID);
@@ -70,11 +86,10 @@ const HomeScreen = () => {
     if (indexToUpdate !== -1) {
       tempContacts[indexToUpdate] = contactToUpdate;
     }
-    console.log(contacts, "\n", tempContacts);
     setContacts(tempContacts);
+    setRender(!render);
   };
 
-  console.log("updated");
 
   return (
     <SafeAreaView style={styles.container}>
@@ -84,7 +99,7 @@ const HomeScreen = () => {
             Add Participents
           </Text>
           <Text style={styles.headerSpan}>
-            1/256
+            {selectedLength} / {contacts.length}
           </Text>
           <TextInput
             // onChangeText={search}
@@ -94,24 +109,23 @@ const HomeScreen = () => {
         </View>
 
         <View style={styles.horizontalListContainer}>
-          {contacts.length > 0 ?
-            <FlatList
-              horizontal
-              data={contacts}
-              renderItem={(contact) => {
-                return (
-                  <HorizontalListItem
-                    key={contact.item.recordID}
-                    item={contact.item}
-                    onPress={selectContact}
-                  />
-                );
-              }}
-              keyExtractor={(item) => item.recordID}
-            />
-            :
-            <NoContactsMsg />
-          }
+          <FlatList
+            horizontal
+            data={contacts}
+            renderItem={(contact) => {
+              return (
+                <>
+                  {contact.item.isSelected &&
+                    <HorizontalListItem
+                      key={contact.item.recordID}
+                      item={contact.item}
+                      onPress={selectContact} />
+                  }
+                </>
+              );
+            }}
+            keyExtractor={(item) => item.recordID}
+          />
         </View>
 
         <View>

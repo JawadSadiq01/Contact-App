@@ -14,14 +14,28 @@ const getAvatarInitials = (textString: string) => {
   return initials;
 };
 
-interface IHorizontalListItem {
-  item: any,
-  onPress: any
+interface IContacts {
+  recordID: string,
+  givenName: string,
+  familyName: string,
+  isSelected: boolean,
+  hasThumbnail: boolean,
+  thumbnailPath: string,
+  push: () => void,
+  pop: () => void
 }
+interface IHorizontalListItem {
+  item: IContacts,
+  onPress: () => void,
+}
+
 
 const HorizontalListItem = (props: IHorizontalListItem) => {
   const { item, onPress } = props;
 
+  const removeContact = () => {
+    onPress(item);
+  }
   return (
     <View>
       <View style={styles.itemContainer}>
@@ -34,6 +48,7 @@ const HorizontalListItem = (props: IHorizontalListItem) => {
             width={50}
             height={50}
             removeButton={true}
+            onPress={removeContact}
           />
           <View style={styles.mainTitleContainer}>
             <Text
@@ -41,7 +56,7 @@ const HorizontalListItem = (props: IHorizontalListItem) => {
               ellipsizeMode="tail"
               style={
                 styles.titleStyle
-              }>{`${item.givenName} ${item.familyName}`}sdfsdfsdf</Text>
+              }>{`${item.givenName} ${item.familyName}`}</Text>
           </View>
         </View>
       </View>

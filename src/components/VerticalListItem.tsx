@@ -14,10 +14,19 @@ const getAvatarInitials = (textString: string) => {
     textSplit[0].charAt(0) + textSplit[textSplit.length - 1].charAt(0);
   return initials;
 };
-
+interface IContacts {
+  recordID: string,
+  givenName: string,
+  familyName: string,
+  isSelected: boolean,
+  hasThumbnail: boolean,
+  thumbnailPath: string,
+  push: () => void,
+  pop: () => void
+}
 interface IListitem {
-  item: any,
-  onPress: any
+  item: IContacts,
+  onPress: () => void,
 }
 
 const VerticalListItem = (props: IListitem) => {

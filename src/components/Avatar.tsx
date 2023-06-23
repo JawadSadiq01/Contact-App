@@ -4,13 +4,14 @@ import PropTypes from 'prop-types';
 import { Avatar, Button } from 'react-native-paper';
 import Icon from 'react-native-paper/lib/typescript/src/components/Icon';
 interface IAvatar {
-  img: any,
+  img: string,
   placeholder: string,
   width: number,
   height: number,
   roundedImage: boolean,
   roundedPlaceholder: boolean,
   removeButton: boolean
+  onPress: () => void
 }
 
 const MyAvatar = (props: IAvatar) => {
@@ -35,14 +36,14 @@ const MyAvatar = (props: IAvatar) => {
     );
   };
 
-  const { img, width, height, removeButton } = props;
+  const { img, width, height, removeButton, onPress } = props;
   const { container } = styles;
   return (
     <View style={[container, { width, height }]}>
       {img ? renderImage() : renderPlaceholder()}
       {removeButton &&
         <View style={styles.RemoveContainer}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={onPress}>
             <Text style={styles.RemoveText}>×</Text>
           </TouchableOpacity>
         </View>
