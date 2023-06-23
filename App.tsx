@@ -11,13 +11,14 @@ const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
   return (
-    <SafeAreaView>
+    <SafeAreaView >
       <HomeScreen />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+
 });
 
 export default App;

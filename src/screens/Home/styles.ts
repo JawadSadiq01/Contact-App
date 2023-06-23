@@ -1,21 +1,50 @@
 import { StyleSheet, Platform } from 'react-native';
+const primaryBg = '#242424';
+const secondaryBg = '#494949';
+const primaryText = '#FFFFFF';
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'gray'
+    backgroundColor: primaryBg,
+    height: '100%'
   },
   header: {
-    backgroundColor: '#4591ed',
-    color: 'white',
+    backgroundColor: secondaryBg,
     paddingHorizontal: 15,
-    paddingVertical: 15,
+    paddingVertical: 12,
     fontSize: 20,
+    alignItems: 'center'
+  },
+  headerMain: {
+    color: primaryText,
+  },
+  headerSpan: {
+    marginTop: 3,
+    color: primaryText,
   },
   searchBar: {
-    backgroundColor: '#f0eded',
+    backgroundColor: '#6D6D6D',
     paddingHorizontal: 30,
-    paddingVertical: Platform.OS === 'android' ? undefined : 15,
+    borderColor: '#6D6D6D',
+    marginTop: 5,
+    borderWidth: 1,
+    borderRadius: 10,
+    color: primaryText,
+    width: '100%',
+    height: 40
   },
+  noContactsMsg: {
+    marginTop: 10,
+    alignItems: 'center'
+  },
+  noContactsMsgText: {
+    fontSize: 20,
+    color: primaryText
+  },
+  horizontalListContainer: {
+    marginTop: 8,
+    // marginLeft: 15
+  }
 });
 
 export default styles;
