@@ -5,13 +5,14 @@ import {
   Text,
   useColorScheme,
 } from 'react-native';
+import HomeScreen from './src/screens/Home/HomeScreen';
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
   return (
     <SafeAreaView>
-      <Text>Contacts App</Text>
+      <HomeScreen />
     </SafeAreaView>
   );
 };
