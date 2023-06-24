@@ -34,6 +34,8 @@ const HomeScreen = () => {
       }
     })();
   }, []);
+  useEffect(() => {
+  }, [render]);
 
   useEffect(() => {
 
