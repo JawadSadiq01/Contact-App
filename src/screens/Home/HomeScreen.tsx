@@ -16,6 +16,7 @@ import { loadContacts } from '../../helpers/Contacts';
 import { IContacts } from '../../Interfaces/interfaces';
 
 const HomeScreen = () => {
+  //-------------------> UseStates initializations<----------------------------
   const [contacts, setContacts] = useState<IContacts>([]);
   const [allcontacts, setAllContacts] = useState<IContacts>([]);
   const [hashData, setHashData] = useState({});
@@ -23,35 +24,35 @@ const HomeScreen = () => {
   const [search, setSearch] = useState("");
   const [render, setRender] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  //------------------->Effects<----------------------------
   useEffect(() => {
+
+    //------------------->Asynchronous Function<----------------------------
     (async () => {
       if (Platform.OS === 'android') {
+        //------------------->Requesting Contacts Reading Permission<----------------------------
         const result = await requestContactsPermission();
         if (result == true) getAllContacts();
-        else { console.log("fds"); PermissionAlert() }
-      } else {
-        getAllContacts();
+        else { PermissionAlert(); }
       }
+      else { getAllContacts(); }
     })();
   }, []);
-  useEffect(() => {
-  }, [render]);
 
-  useEffect(() => {
-
-  }, [render]);
-
+  //------------------->Getting all Contacts from device Contacts Book<----------------------------
   const getAllContacts = async () => {
     (async () => {
-      const AllCOntacts = await loadContacts();
-      const dataList = Object.values(AllCOntacts);
-      setHashData(AllCOntacts);
+      const AllContacts = await loadContacts();
+      const dataList = Object.values(AllContacts);
+      setHashData(AllContacts);
       setContacts(dataList);
       setAllContacts(dataList);
       setLoading(false);
     })();
   };
 
+  //------------------->Searching Contacts<----------------------------
   const SearchContacts = () => {
     setLoading(true);
     const filteredData = allcontacts.filter((item) => {
@@ -61,13 +62,16 @@ const HomeScreen = () => {
     setLoading(false);
   }
 
-  const selectContact = (contact: IContact) => {
-    var tempdata = selectedHashData;
+  //------------------->Selecting Contacts from all Contacts<----------------------------
+  const selectContact = (contact: IContacts) => {
+    var currentHashData = selectedHashData;
 
-    if (tempdata[contact.recordID]) {
-      delete tempdata[contact.recordID];
+    if (currentHashData[contact.recordID]) {
+      //-------------->Removing Contact from Selected contacts<-------------------
+      delete currentHashData[contact.recordID];
     }
     else {
+      //-------------->Adding Contact in Selected contacts<-------------------
       const value = {
         recordID: contact.recordID,
         givenName: contact.givenName,
@@ -76,14 +80,12 @@ const HomeScreen = () => {
         hasThumbnail: contact.hasThumbnail,
         thumbnailPath: contact.thumbnailPath
       };
-      var tempdata = ({ ...tempdata, [contact.recordID]: value });
-      setSelectedHashData(tempdata);
+      var currentHashData = ({ ...currentHashData, [contact.recordID]: value });
+      setSelectedHashData(currentHashData);
     }
     setRender(!render);
   };
-  const showAlert = () => {
-    Alert.alert('Alert Title', 'This is an alert message.');
-  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.container}>
@@ -120,7 +122,7 @@ const HomeScreen = () => {
             renderItem={(contact) => {
               return (
                 <>
-                  {contact.item.isSelected &&
+                  {contact?.item?.isSelected &&
                     <HorizontalListItem
                       key={contact.item.recordID}
                       item={contact.item}

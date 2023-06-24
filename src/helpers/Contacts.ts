@@ -17,8 +17,8 @@ const loadContacts = async () => {
   var data = {};
 
   await Contacts.getAll().then(contacts => {
-    contacts.map((c) => {
-      const temp: IContacts = {
+    contacts?.map((c) => {
+      const singleContact: IContacts = {
         recordID: c.recordID,
         givenName: c.givenName,
         familyName: c.familyName,
@@ -26,7 +26,7 @@ const loadContacts = async () => {
         hasThumbnail: c.hasThumbnail,
         thumbnailPath: c.thumbnailPath
       };
-      myContacts.push(temp);
+      myContacts.push(singleContact);
 
       const key = c.recordID;
       const value = {
@@ -59,5 +59,14 @@ const loadContacts = async () => {
   return data;
 
 };
+const getAvatarInitials = (textString: string) => {
+  if (!textString) return '';
+  const text = textString.trim();
+  const textSplit = text.split(' ');
+  if (textSplit.length <= 1) return text.charAt(0);
+  const initials =
+    textSplit[0].charAt(0) + textSplit[textSplit.length - 1].charAt(0);
+  return initials;
+};
 
-export { getSelectedLength, loadContacts };
+export { getSelectedLength, loadContacts, getAvatarInitials };
