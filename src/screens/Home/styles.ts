@@ -22,6 +22,22 @@ const styles = StyleSheet.create({
     marginTop: 3,
     color: primaryText,
   },
+  searchContainer: {
+    flexDirection: 'row',
+    display: 'flex',
+    height: 40,
+    marginBottom: 6
+  },
+  searchIcon: {
+    position: 'absolute',
+    zIndex: 1,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 50,
+    left: 5,
+    top: 0
+  },
   searchBar: {
     backgroundColor: '#6D6D6D',
     paddingHorizontal: 30,

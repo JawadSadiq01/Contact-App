@@ -1,9 +1,10 @@
 import React, { memo } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Button } from 'react-native';
+import { View, Text } from 'react-native';
 import { RadioButton } from 'react-native-paper';
-
 import PropTypes from 'prop-types';
 import MyAvatar from './Avatar';
+import { VerticalContactsStyles } from './styles';
+import { IListitem } from '../Interfaces/interfaces';
 
 const getAvatarInitials = (textString: string) => {
   if (!textString) return '';
@@ -15,21 +16,12 @@ const getAvatarInitials = (textString: string) => {
   return initials;
 };
 
-interface IListitem {
-  item: any,
-  onPress: any
-}
-
 const VerticalListItem = (props: IListitem) => {
-  const shouldComponentUpdate = () => {
-    return false;
-  };
-  const { item, onPress } = props;
-
+  const { item, onPress, selectedHashData } = props;
   return (
     <View>
-      <View style={styles.itemContainer}>
-        <View style={styles.leftElementContainer}>
+      <View style={VerticalContactsStyles.itemContainer}>
+        <View style={VerticalContactsStyles.leftElementContainer}>
           <MyAvatar
             img={item.hasThumbnail ? { uri: item.thumbnailPath } : undefined}
             placeholder={getAvatarInitials(
@@ -40,20 +32,20 @@ const VerticalListItem = (props: IListitem) => {
             removeButton={false}
           />
         </View>
-        <View style={styles.rightSectionContainer}>
-          <View style={styles.mainTitleContainer}>
+        <View style={VerticalContactsStyles.rightSectionContainer}>
+          <View style={VerticalContactsStyles.mainTitleContainer}>
             <Text
               style={
-                styles.titleStyle
+                VerticalContactsStyles.titleStyle
               }>{`${item.givenName} ${item.familyName}`}</Text>
           </View>
         </View>
 
-        <View style={styles.actionSectionContainer}>
+        <View style={VerticalContactsStyles.actionSectionContainer}>
           <RadioButton
             color='gray'
             value="first"
-            status={item.isSelected == true ? 'checked' : 'unchecked'}
+            status={selectedHashData[item.recordID] ? 'checked' : 'unchecked'}
             onPress={() => onPress(item)}
           />
         </View>
@@ -63,45 +55,9 @@ const VerticalListItem = (props: IListitem) => {
   );
 };
 
-const styles = StyleSheet.create({
-  itemContainer: {
-    flexDirection: 'row',
-    minHeight: 44,
-    height: 63,
-    alignItems: 'center',
-    marginLeft: 22,
-    marginRight: 15,
-  },
-  leftElementContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    flex: 2,
-  },
-  rightSectionContainer: {
-    marginLeft: 18,
-    flexDirection: 'row',
-    flex: 20,
-    // borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: '#515151',
-    color: 'white',
-  },
-  actionSectionContainer: {
-
-  },
-  mainTitleContainer: {
-    justifyContent: 'center',
-    flexDirection: 'column',
-    flex: 1,
-  },
-  titleStyle: {
-    fontSize: 16,
-    color: 'white'
-  },
-});
-
-export default memo(VerticalListItem);
-
 VerticalListItem.propTypes = {
   item: PropTypes.object,
   onPress: PropTypes.func,
 };
+
+export default memo(VerticalListItem);

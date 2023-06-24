@@ -1,8 +1,9 @@
 import React, { memo } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Button } from 'react-native';
-import { RadioButton } from 'react-native-paper';
+import { View, Text } from 'react-native';
 import PropTypes from 'prop-types';
 import MyAvatar from './Avatar';
+import { HorizontalContactsStyles } from './styles';
+import { IHorizontalListItem } from '../Interfaces/interfaces';
 
 const getAvatarInitials = (textString: string) => {
   if (!textString) return '';
@@ -14,18 +15,16 @@ const getAvatarInitials = (textString: string) => {
   return initials;
 };
 
-interface IHorizontalListItem {
-  item: any,
-  onPress: any
-}
-
 const HorizontalListItem = (props: IHorizontalListItem) => {
   const { item, onPress } = props;
 
+  const removeContact = () => {
+    onPress(item);
+  }
   return (
     <View>
-      <View style={styles.itemContainer}>
-        <View style={styles.leftElementContainer}>
+      <View style={HorizontalContactsStyles.itemContainer}>
+        <View style={HorizontalContactsStyles.leftElementContainer}>
           <MyAvatar
             img={item.hasThumbnail ? { uri: item.thumbnailPath } : undefined}
             placeholder={getAvatarInitials(
@@ -34,42 +33,21 @@ const HorizontalListItem = (props: IHorizontalListItem) => {
             width={50}
             height={50}
             removeButton={true}
+            onPress={removeContact}
           />
-          <View style={styles.mainTitleContainer}>
+          <View style={HorizontalContactsStyles.mainTitleContainer}>
             <Text
               numberOfLines={1}
               ellipsizeMode="tail"
               style={
-                styles.titleStyle
-              }>{`${item.givenName} ${item.familyName}`}sdfsdfsdf</Text>
+                HorizontalContactsStyles.titleStyle
+              }>{`${item.givenName} ${item.familyName}`}</Text>
           </View>
         </View>
       </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  itemContainer: {
-    flexDirection: 'row',
-    minHeight: 44,
-    height: 80,
-    alignItems: 'center',
-    marginLeft: 16,
-  },
-  leftElementContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  mainTitleContainer: {
-    width: 50,
-    marginTop: 3
-  },
-  titleStyle: {
-    fontSize: 12,
-    color: 'white'
-  },
-});
 
 HorizontalListItem.propTypes = {
   item: PropTypes.object,

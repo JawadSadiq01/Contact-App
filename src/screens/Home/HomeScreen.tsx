@@ -1,81 +1,87 @@
 import React, { useState, useEffect } from 'react';
 import {
-  PermissionsAndroid,
   Platform,
   SafeAreaView,
-  StyleSheet,
   Text,
   View,
   FlatList,
   TextInput,
   Alert,
 } from 'react-native';
-import Contacts from 'react-native-contacts';
 import { requestContactsPermission } from '../../helpers/ContactsPermission';
 import ListItem from '../../components/VerticalListItem';
 import styles from './styles';
 import HorizontalListItem from '../../components/HorizontalListItem';
-
-interface contacts { }
+import { loadContacts } from '../../helpers/Contacts';
+import { IContacts } from '../../Interfaces/interfaces';
 
 const HomeScreen = () => {
-  const [contacts, setContacts] = useState([]);
-  const [selectedContacts, setSelectedContacts] = useState([]);
-
+  const [contacts, setContacts] = useState<IContacts>([]);
+  const [allcontacts, setAllContacts] = useState<IContacts>([]);
+  const [hashData, setHashData] = useState({});
+  const [selectedHashData, setSelectedHashData] = useState({});
+  const [search, setSearch] = useState("");
+  const [render, setRender] = useState(false);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-
     (async () => {
       if (Platform.OS === 'android') {
         const result = await requestContactsPermission();
-        if (result == true) loadContacts();
+        if (result == true) getAllContacts();
+        else { console.log("fds"); PermissionAlert() }
       } else {
-        loadContacts();
+        getAllContacts();
       }
     })();
-
   }, []);
 
-  const loadContacts = () => {
-    console.log("loading contacts");
-    Contacts.getAll().then(contacts => {
-      const myContacts = [];
-      contacts.map((c) => {
-        // console.log(c);
-        const temp = {
-          recordID: c.recordID,
-          givenName: c.givenName,
-          familyName: c.familyName,
-          isSelected: false,
-          hasThumbnail: c.hasThumbnail,
-          thumbnailPath: c.thumbnailPath
-        };
-        myContacts.push(temp);
-      });
-      // console.log(myContacts);
-      setContacts(myContacts);
-    }).catch(e => {
-      console.warn('Permission to access contacts was denied');
+  useEffect(() => {
+
+  }, [render]);
+
+  const getAllContacts = async () => {
+    (async () => {
+      const AllCOntacts = await loadContacts();
+      const dataList = Object.values(AllCOntacts);
+      setHashData(AllCOntacts);
+      setContacts(dataList);
+      setAllContacts(dataList);
+      setLoading(false);
+    })();
+  };
+
+  const SearchContacts = () => {
+    setLoading(true);
+    const filteredData = allcontacts.filter((item) => {
+      return item.givenName.toLowerCase().includes(search.toLowerCase()) || item.familyName.toLowerCase().includes(search.toLowerCase());
     });
-  };
+    setContacts(filteredData);
+    setLoading(false);
+  }
 
-  const selectContact = (contact: any) => {
-    let tempContacts = contacts;
-    const contactToUpdate = tempContacts.find(c => c.recordID === contact.recordID);
-    const indexToUpdate = tempContacts.findIndex(c => c.recordID === contact.recordID);
+  const selectContact = (contact: IContact) => {
+    var tempdata = selectedHashData;
 
-    if (contactToUpdate) {
-      contactToUpdate.isSelected = !contactToUpdate.isSelected;
+    if (tempdata[contact.recordID]) {
+      delete tempdata[contact.recordID];
     }
-
-    if (indexToUpdate !== -1) {
-      tempContacts[indexToUpdate] = contactToUpdate;
+    else {
+      const value = {
+        recordID: contact.recordID,
+        givenName: contact.givenName,
+        familyName: contact.familyName,
+        isSelected: true,
+        hasThumbnail: contact.hasThumbnail,
+        thumbnailPath: contact.thumbnailPath
+      };
+      var tempdata = ({ ...tempdata, [contact.recordID]: value });
+      setSelectedHashData(tempdata);
     }
-    console.log(contacts, "\n", tempContacts);
-    setContacts(tempContacts);
+    setRender(!render);
   };
-
-  console.log("updated");
-
+  const showAlert = () => {
+    Alert.alert('Alert Title', 'This is an alert message.');
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.container}>
@@ -84,38 +90,50 @@ const HomeScreen = () => {
             Add Participents
           </Text>
           <Text style={styles.headerSpan}>
-            1/256
+            {Object.values(selectedHashData).length} / {contacts?.length}
           </Text>
-          <TextInput
-            // onChangeText={search}
-            placeholder="Search"
-            style={styles.searchBar}
-          />
+          <View style={styles.searchContainer}>
+            <View style={styles.searchIcon}>
+              <Text>🔎</Text>
+            </View>
+            <TextInput
+              onChangeText={(s) => {
+                setSearch(s);
+                if (s == "") { setContacts(allcontacts); }
+              }}
+              cursorColor={"white"}
+              value={search}
+              placeholderTextColor={'white'}
+              placeholder="Search"
+              style={styles.searchBar}
+              onEndEditing={() => SearchContacts()}
+            />
+          </View>
         </View>
 
         <View style={styles.horizontalListContainer}>
-          {contacts.length > 0 ?
-            <FlatList
-              horizontal
-              data={contacts}
-              renderItem={(contact) => {
-                return (
-                  <HorizontalListItem
-                    key={contact.item.recordID}
-                    item={contact.item}
-                    onPress={selectContact}
-                  />
-                );
-              }}
-              keyExtractor={(item) => item.recordID}
-            />
-            :
-            <NoContactsMsg />
-          }
+          <FlatList
+            horizontal
+            data={Object.values(selectedHashData)}
+            renderItem={(contact) => {
+              return (
+                <>
+                  {contact.item.isSelected &&
+                    <HorizontalListItem
+                      key={contact.item.recordID}
+                      item={contact.item}
+                      onPress={selectContact}
+                    />
+                  }
+                </>
+              );
+            }}
+            keyExtractor={(item) => item.recordID}
+          />
         </View>
 
-        <View>
-          {contacts.length > 0 ?
+        {!loading ? <View>
+          {contacts?.length > 0 ?
             <FlatList
               data={contacts}
               renderItem={(contact) => {
@@ -124,6 +142,7 @@ const HomeScreen = () => {
                     key={contact.item.recordID}
                     item={contact.item}
                     onPress={selectContact}
+                    selectedHashData={selectedHashData}
                   />
                 );
               }}
@@ -133,6 +152,8 @@ const HomeScreen = () => {
             <NoContactsMsg />
           }
         </View>
+          : <ContactsLoading />
+        }
       </View>
     </SafeAreaView>
   );
@@ -147,4 +168,28 @@ const NoContactsMsg = () => {
     </View>
   )
 }
+
+const ContactsLoading = () => {
+  return (
+    <View style={styles.noContactsMsg}>
+      <Text style={styles.noContactsMsgText} >
+        Loading...
+      </Text>
+    </View>
+  )
+}
+
+const PermissionAlert = () => Alert.alert(
+  "Permissions Error",
+  "Please grant contacts read permission!",
+  [
+    {
+      text: "Cancel",
+      onPress: () => console.log("Cancel Pressed"),
+      style: "cancel"
+    },
+    { text: "OK", onPress: () => console.log("OK Pressed") }
+  ]
+)
+
 export default HomeScreen;
