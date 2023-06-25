@@ -12,18 +12,15 @@ import { requestContactsPermission } from '../../helpers/ContactsPermission';
 import ListItem from '../../components/VerticalListItem';
 import styles from './styles';
 import HorizontalListItem from '../../components/HorizontalListItem';
-import { loadContacts } from '../../helpers/Contacts';
+import { getSelectedLength, loadContacts } from '../../helpers/Contacts';
 import { IContacts } from '../../Interfaces/interfaces';
 
 const HomeScreen = () => {
   //-------------------> UseStates initializations<----------------------------
   const [contacts, setContacts] = useState<IContacts>([]);
   const [allcontacts, setAllContacts] = useState<IContacts>([]);
-  const [hashData, setHashData] = useState({});
-  const [selectedHashData, setSelectedHashData] = useState({});
-  const [selectedContacts, setSelectedContacts] = useState({});
+  const [selectedLength, setSelectedLength] = useState(0);
   const [search, setSearch] = useState("");
-  const [render, setRender] = useState(false);
   const [loading, setLoading] = useState(true);
 
   //------------------->Effects<----------------------------
@@ -40,12 +37,18 @@ const HomeScreen = () => {
     })();
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      const length = await getSelectedLength(allcontacts);
+      setSelectedLength(length);
+    })();
+  }, [contacts]);
+
   //------------------->Getting all Contacts from device Contacts Book<----------------------------
   const getAllContacts = async () => {
     (async () => {
       const AllContacts = await loadContacts();
       const dataList = Object.values(AllContacts);
-      setHashData(AllContacts);
       setContacts(dataList);
       setAllContacts(dataList);
       setLoading(false);
@@ -82,6 +85,12 @@ const HomeScreen = () => {
       newArray[index] = updatedObject; // Update the contact at the specified index
       return newArray; // Return the updated contacts
     });
+
+    setAllContacts((prevArray) => {
+      const newArray = [...prevArray]; // Create a new array with the same contacts
+      newArray[index] = updatedObject; // Update the contact at the specified index
+      return newArray; // Return the updated contacts
+    });
   };
 
   return (
@@ -92,7 +101,7 @@ const HomeScreen = () => {
             Add Participents
           </Text>
           <Text style={styles.headerSpan}>
-            {Object.values(selectedHashData).length} / {contacts?.length}
+            {selectedLength} / {contacts?.length}
           </Text>
           <View style={styles.searchContainer}>
             <View style={styles.searchIcon}>
@@ -116,7 +125,7 @@ const HomeScreen = () => {
         <View style={styles.horizontalListContainer}>
           <FlatList
             horizontal
-            data={contacts}
+            data={allcontacts}
             snapToInterval={90}
             windowSize={4}
             renderItem={({ item, index }) => (
@@ -150,7 +159,6 @@ const HomeScreen = () => {
                   key={item.recordID}
                   item={item}
                   onPress={selectContact}
-                  selectedHashData={selectedHashData}
                   index={index}
                 />
               )}

@@ -8,7 +8,7 @@ import { IListitem } from '../Interfaces/interfaces';
 import { getAvatarInitials } from '../helpers/Contacts';
 
 const VerticalListItem = (props: IListitem) => {
-  const { item, onPress, selectedHashData, index } = props;
+  const { item, onPress, index } = props;
   return (
     <View>
       <View style={VerticalContactsStyles.itemContainer}>
