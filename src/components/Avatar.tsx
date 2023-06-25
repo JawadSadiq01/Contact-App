@@ -6,6 +6,9 @@ import { Avatar } from 'react-native-paper';
 import { IAvatar } from '../Interfaces/interfaces';
 
 const MyAvatar = (props: IAvatar) => {
+  const { img, width, height, removeButton, onPress } = props;
+  const { container } = AvatarStyles;
+
   const renderImage = () => {
     const { img, width } = props;
     return (
@@ -26,8 +29,6 @@ const MyAvatar = (props: IAvatar) => {
     );
   };
 
-  const { img, width, height, removeButton, onPress } = props;
-  const { container } = AvatarStyles;
   return (
     <View style={[container, { width, height }]}>
       {img ? renderImage() : renderPlaceholder()}
