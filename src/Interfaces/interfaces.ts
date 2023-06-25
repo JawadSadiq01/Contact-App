@@ -21,9 +21,11 @@ interface IAvatar {
 interface IHorizontalListItem {
   item: IContacts,
   onPress: () => void,
+  index: number,
 }
 interface IListitem {
   item: IContacts,
   onPress: () => void,
+  index: number
 }
 export { IContacts, IListitem, IAvatar, IHorizontalListItem }

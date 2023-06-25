@@ -21,13 +21,13 @@ const HomeScreen = () => {
   const [allcontacts, setAllContacts] = useState<IContacts>([]);
   const [hashData, setHashData] = useState({});
   const [selectedHashData, setSelectedHashData] = useState({});
+  const [selectedContacts, setSelectedContacts] = useState({});
   const [search, setSearch] = useState("");
   const [render, setRender] = useState(false);
   const [loading, setLoading] = useState(true);
 
   //------------------->Effects<----------------------------
   useEffect(() => {
-
     //------------------->Asynchronous Function<----------------------------
     (async () => {
       if (Platform.OS === 'android') {
@@ -63,27 +63,25 @@ const HomeScreen = () => {
   }
 
   //------------------->Selecting Contacts from all Contacts<----------------------------
-  const selectContact = (contact: IContacts) => {
-    var currentHashData = selectedHashData;
+  const selectContact = (contact: IContacts, index: number) => {
 
-    if (currentHashData[contact.recordID]) {
-      //-------------->Removing Contact from Selected contacts<-------------------
-      delete currentHashData[contact.recordID];
-    }
-    else {
-      //-------------->Adding Contact in Selected contacts<-------------------
-      const value = {
-        recordID: contact.recordID,
-        givenName: contact.givenName,
-        familyName: contact.familyName,
-        isSelected: true,
-        hasThumbnail: contact.hasThumbnail,
-        thumbnailPath: contact.thumbnailPath
-      };
-      var currentHashData = ({ ...currentHashData, [contact.recordID]: value });
-      setSelectedHashData(currentHashData);
-    }
-    setRender(!render);
+    const updatedContact = {
+      recordID: contact.recordID,
+      givenName: contact.givenName,
+      familyName: contact.familyName,
+      isSelected: !contact.isSelected,
+      hasThumbnail: contact.hasThumbnail,
+      thumbnailPath: contact.thumbnailPath
+    }; // Updated Contact
+    updateObjectInArray(index, updatedContact);
+  };
+
+  const updateObjectInArray = (index: number, updatedObject: IContacts) => {
+    setContacts((prevArray) => {
+      const newArray = [...prevArray]; // Create a new array with the same contacts
+      newArray[index] = updatedObject; // Update the contact at the specified index
+      return newArray; // Return the updated contacts
+    });
   };
 
   return (
@@ -118,20 +116,22 @@ const HomeScreen = () => {
         <View style={styles.horizontalListContainer}>
           <FlatList
             horizontal
-            data={Object.values(selectedHashData)}
-            renderItem={(contact) => {
-              return (
-                <>
-                  {contact?.item?.isSelected &&
-                    <HorizontalListItem
-                      key={contact.item.recordID}
-                      item={contact.item}
-                      onPress={selectContact}
-                    />
-                  }
-                </>
-              );
-            }}
+            data={contacts}
+            snapToInterval={90}
+            windowSize={4}
+            renderItem={({ item, index }) => (
+              <>
+                {item?.isSelected &&
+                  <HorizontalListItem
+                    key={item.recordID}
+                    item={item}
+                    onPress={selectContact}
+                    index={index}
+                  />
+                }
+              </>
+            )
+            }
             keyExtractor={(item) => item.recordID}
           />
         </View>
@@ -139,18 +139,21 @@ const HomeScreen = () => {
         {!loading ? <View>
           {contacts?.length > 0 ?
             <FlatList
+              windowSize={4}
               data={contacts}
-              renderItem={(contact) => {
-                return (
-                  <ListItem
-                    key={contact.item.recordID}
-                    item={contact.item}
-                    onPress={selectContact}
-                    selectedHashData={selectedHashData}
-                  />
-                );
-              }}
+              removeClippedSubviews
+              disableVirtualization={false}
               keyExtractor={(item) => item.recordID}
+              maxToRenderPerBatch={5}
+              renderItem={({ item, index }) => (
+                <ListItem
+                  key={item.recordID}
+                  item={item}
+                  onPress={selectContact}
+                  selectedHashData={selectedHashData}
+                  index={index}
+                />
+              )}
             />
             :
             <NoContactsMsg />

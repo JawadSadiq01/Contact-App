@@ -8,7 +8,7 @@ import { IListitem } from '../Interfaces/interfaces';
 import { getAvatarInitials } from '../helpers/Contacts';
 
 const VerticalListItem = (props: IListitem) => {
-  const { item, onPress, selectedHashData } = props;
+  const { item, onPress, selectedHashData, index } = props;
   return (
     <View>
       <View style={VerticalContactsStyles.itemContainer}>
@@ -31,8 +31,8 @@ const VerticalListItem = (props: IListitem) => {
           <RadioButton
             color='gray'
             value="first"
-            status={selectedHashData[item.recordID] ? 'checked' : 'unchecked'}
-            onPress={() => onPress(item)}
+            status={item.isSelected == true ? 'checked' : 'unchecked'}
+            onPress={() => onPress(item, index)}
           />
         </View>
 

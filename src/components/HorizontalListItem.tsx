@@ -7,10 +7,10 @@ import { IHorizontalListItem } from '../Interfaces/interfaces';
 import { getAvatarInitials } from '../helpers/Contacts';
 
 const HorizontalListItem = (props: IHorizontalListItem) => {
-  const { item, onPress } = props;
+  const { item, onPress, index } = props;
 
   const removeContact = () => {
-    onPress(item);
+    onPress(item, index);
   }
 
   return (

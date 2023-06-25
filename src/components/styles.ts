@@ -92,9 +92,6 @@ const VerticalContactsStyles = StyleSheet.create({
     borderColor: '#515151',
     color: 'white',
   },
-  actionSectionContainer: {
-
-  },
   mainTitleContainer: {
     justifyContent: 'center',
     flexDirection: 'column',

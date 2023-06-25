@@ -59,7 +59,6 @@ const styles = StyleSheet.create({
   },
   horizontalListContainer: {
     marginTop: 8,
-    // marginLeft: 15
   }
 });
 
